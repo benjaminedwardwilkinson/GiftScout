@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Admin — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap">
+    <div class="admin-header">
+        <h1>Admin</h1>
+        <div>
+            <a class="button-link" href="/admin/products/new">+ Add product</a>
+            <a class="button-link secondary" href="/admin/categories">Categories</a>
+            <a class="button-link secondary" href="/admin/stats">Stats</a>
+            <a class="button-link secondary" href="/admin/backup">Backups</a>
+            <a class="button-link secondary" href="/admin/settings">Account</a>
+            <a class="button-link secondary" href="/">View site</a>
+            <a class="button-link secondary" href="/admin/logout">Log out</a>
+        </div>
+    </div>
+
+    {% if products|length == 0 %}
+        <p class="empty-state">No products yet. Add your first one.</p>
+    {% else %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Order</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr class="{{ 'archived' if product.status == 'archived' else '' }}">
+                <td>
+                    {% if product.status == 'active' %}
+                    <div class="row-actions">
+                        <form method="post" action="/admin/products/{{ product.id }}/move/up">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button" title="Move up">↑</button>
+                        </form>
+                        <form method="post" action="/admin/products/{{ product.id }}/move/down">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button" title="Move down">↓</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category_name or "—" }}</td>
+                <td>{{ product.price or "—" }}</td>
+                <td>
+                    <span class="status-badge {{ product.status }}">{{ product.status }}</span>
+                </td>
+                <td>
+                    <div class="row-actions">
+                        <a class="icon-button" href="/admin/products/{{ product.id }}/edit">Edit</a>
+                        {% if product.status == 'active' %}
+                        <form method="post" action="/admin/products/{{ product.id }}/archive">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button" title="Hide from the public site without deleting it">Archive</button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="/admin/products/{{ product.id }}/restore">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button">Restore</button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="/admin/products/{{ product.id }}/delete"
+                              onsubmit="return confirm('Delete &quot;{{ product.name }}&quot; permanently? This also removes its photos. This cannot be undone.');">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</main>
+{% endblock %}

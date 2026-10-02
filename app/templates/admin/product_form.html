@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit Product" if product else "Add Product" }} — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>{{ "Edit Product" if product else "Add Product" }}</h1>
+        <a class="button-link secondary" href="/admin">Back</a>
+    </div>
+
+    {% if images and images|length > 0 %}
+    <section class="existing-photos-section">
+        <h2 class="section-label">Photos</h2>
+        <div class="existing-photos">
+            {% for img in images %}
+            <div class="existing-photo">
+                {% if loop.first %}<span class="main-photo-badge">Main</span>{% endif %}
+                <img src="{{ img.image_path }}" alt="">
+                <div class="existing-photo-actions">
+                    <form method="post" action="/admin/products/{{ product.id }}/photos/{{ img.id }}/move/up">
+                        {{ csrf_field(request) }}
+                        <button type="submit" class="icon-button tiny" title="Move earlier">↑</button>
+                    </form>
+                    <form method="post" action="/admin/products/{{ product.id }}/photos/{{ img.id }}/move/down">
+                        {{ csrf_field(request) }}
+                        <button type="submit" class="icon-button tiny" title="Move later">↓</button>
+                    </form>
+                    <form method="post" action="/admin/products/{{ product.id }}/photos/{{ img.id }}/delete"
+                          onsubmit="return confirm('Remove this photo?');">
+                        {{ csrf_field(request) }}
+                        <button type="submit" class="icon-button tiny danger" title="Remove">✕</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="field-hint">First photo is the main image shown on the homepage. Reordering and removing happen immediately — they don't need Save.</p>
+    </section>
+    {% endif %}
+
+    <form method="post"
+          action="{{ '/admin/products/%d/edit' % product.id if product else '/admin/products/new' }}"
+          enctype="multipart/form-data" class="stacked-form">
+        {{ csrf_field(request) }}
+        <label>
+            Product name
+            <input type="text" name="name" required value="{{ product.name if product else '' }}">
+        </label>
+        <label>
+            URL slug
+            <input type="text" name="slug" value="{{ product.slug if product else '' }}" placeholder="auto-generated from the name if left blank">
+        </label>
+        {% if product %}
+        <p class="field-hint">Public URL: /product/{{ product.slug }} — changing this breaks any link to this product that's already been shared.</p>
+        {% endif %}
+
+        <label>
+            {{ "Add more photos" if images and images|length > 0 else "Photos" }}
+            <input type="file" name="images" accept="image/*" multiple>
+        </label>
+        {% if not images or images|length == 0 %}
+        <p class="field-hint">First photo becomes the main image shown on the homepage. Add several to get an Amazon-style photo strip.</p>
+        {% endif %}
+
+        <label>
+            Why you recommend it
+            <textarea name="why_recommend" rows="3">{{ product.why_recommend if product else '' }}</textarea>
+        </label>
+        <label>
+            Short description
+            <textarea name="description" rows="3">{{ product.description if product else '' }}</textarea>
+        </label>
+        <label>
+            Price (optional)
+            <input type="text" name="price" placeholder="e.g. $49" value="{{ product.price if product else '' }}">
+        </label>
+        <label>
+            Category (optional)
+            <select name="category_id">
+                <option value="">— none —</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if product and product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <p class="field-hint"><a href="/admin/categories">Manage categories</a></p>
+        <label>
+            Affiliate / purchase URL
+            <input type="url" name="affiliate_url" required placeholder="https://..." value="{{ product.affiliate_url if product else '' }}">
+        </label>
+        <button type="submit">{{ "Save changes" if product else "Save product" }}</button>
+    </form>
+</main>
+{% endblock %}

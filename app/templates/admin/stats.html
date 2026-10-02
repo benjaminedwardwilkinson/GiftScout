@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Stats — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>Stats</h1>
+        <a class="button-link secondary" href="/admin">Back</a>
+    </div>
+
+    <p class="field-hint">
+        Built-in, self-hosted — nothing sent to a third party. Pageviews count visits to
+        the homepage, category pages, and product pages. Clicks count taps on a
+        "Check it out" button (tracked via a redirect, so the count is accurate even
+        though the visitor ends up on the affiliate site).
+    </p>
+
+    <div class="stats-grid">
+        <div class="stats-card">
+            <span class="stats-number">{{ views_7d }}</span>
+            <span class="stats-label">Pageviews, last 7 days</span>
+        </div>
+        <div class="stats-card">
+            <span class="stats-number">{{ views_30d }}</span>
+            <span class="stats-label">Pageviews, last 30 days</span>
+        </div>
+        <div class="stats-card">
+            <span class="stats-number">{{ views_all }}</span>
+            <span class="stats-label">Pageviews, all time</span>
+        </div>
+        <div class="stats-card">
+            <span class="stats-number">{{ clicks_7d }}</span>
+            <span class="stats-label">Clicks, last 7 days</span>
+        </div>
+        <div class="stats-card">
+            <span class="stats-number">{{ clicks_30d }}</span>
+            <span class="stats-label">Clicks, last 30 days</span>
+        </div>
+        <div class="stats-card">
+            <span class="stats-number">{{ clicks_all }}</span>
+            <span class="stats-label">Clicks, all time</span>
+        </div>
+    </div>
+
+    <h2 class="section-label">Top products by clicks</h2>
+    {% if top_products|length == 0 %}
+    <p class="empty-state">No clicks recorded yet.</p>
+    {% else %}
+    <table class="admin-table">
+        <thead><tr><th>Product</th><th>Clicks</th></tr></thead>
+        <tbody>
+            {% for row in top_products %}
+            <tr><td>{{ row.name }}</td><td>{{ row.clicks }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2 class="section-label" style="margin-top: 24px;">Top pages by views</h2>
+    {% if top_pages|length == 0 %}
+    <p class="empty-state">No pageviews recorded yet.</p>
+    {% else %}
+    <table class="admin-table">
+        <thead><tr><th>Page</th><th>Views</th></tr></thead>
+        <tbody>
+            {% for row in top_pages %}
+            <tr><td>{{ row.path }}</td><td>{{ row.views }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</main>
+{% endblock %}

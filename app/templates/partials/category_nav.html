@@ -1,0 +1,8 @@
+{% if categories_nav|length > 0 %}
+<nav class="category-nav">
+    <a class="category-pill {{ 'active' if active_category_id is none else '' }}" href="/">All</a>
+    {% for cat in categories_nav %}
+    <a class="category-pill {{ 'active' if active_category_id == cat.id else '' }}" href="/category/{{ cat.slug }}">{{ cat.name }}</a>
+    {% endfor %}
+</nav>
+{% endif %}

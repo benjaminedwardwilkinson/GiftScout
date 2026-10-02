@@ -1,0 +1,78 @@
+{% if products|length == 0 %}
+    <p class="empty-state">{{ empty_message }}</p>
+{% else %}
+<div class="product-grid">
+    {% for product in products %}
+    {% set images = images_by_product[product.id] %}
+    <article class="product-card">
+        <div class="product-gallery" data-product-gallery="{{ product.id }}">
+            {% if images|length > 0 %}
+            <a href="/product/{{ product.slug }}" class="gallery-link">
+                <img class="gallery-main" src="{{ images[0].image_path }}" alt="{{ product.name }}">
+            </a>
+            {% if images|length > 1 %}
+            <div class="gallery-thumbs">
+                {% for img in images %}
+                <button type="button"
+                        class="gallery-thumb {% if loop.first %}active{% endif %}"
+                        aria-label="Show photo {{ loop.index }} of {{ product.name }}"
+                        onclick="gsSwapImage('{{ img.image_path }}', this)">
+                    <img src="{{ img.image_path }}" alt="{{ product.name }} — photo {{ loop.index }}">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="gallery-main product-image-placeholder"></div>
+            {% endif %}
+        </div>
+        <div class="product-body">
+            {% if product.category_name %}
+            <a class="product-category" href="/category/{{ product.category_slug }}">{{ product.category_name }}</a>
+            {% endif %}
+            <h2 class="product-name"><a class="product-name-link" href="/product/{{ product.slug }}">{{ product.name }}</a></h2>
+            {% if product.price %}
+            <p class="product-price">{{ product.price }}</p>
+            {% endif %}
+            {% if product.why_recommend %}
+            <div class="text-block">
+                <p class="product-why text-content {{ 'clamped' if product.why_recommend|length > 220 else '' }}">{{ product.why_recommend }}</p>
+                {% if product.why_recommend|length > 220 %}
+                <button type="button" class="read-more-btn" onclick="gsToggleText(this)">Read more</button>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if product.description %}
+            <div class="text-block">
+                <p class="product-description text-content {{ 'clamped' if product.description|length > 220 else '' }}">{{ product.description }}</p>
+                {% if product.description|length > 220 %}
+                <button type="button" class="read-more-btn" onclick="gsToggleText(this)">Read more</button>
+                {% endif %}
+            </div>
+            {% endif %}
+            <a class="buy-button" href="/go/{{ product.id }}" target="_blank" rel="noopener sponsored nofollow">
+                Check it out
+            </a>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+<script>
+function gsSwapImage(src, btn) {
+    var gallery = btn.closest('[data-product-gallery]');
+    var main = gallery.querySelector('.gallery-main');
+    if (main) { main.src = src; }
+    gallery.querySelectorAll('.gallery-thumb').forEach(function (t) {
+        t.classList.remove('active');
+    });
+    btn.classList.add('active');
+}
+
+function gsToggleText(btn) {
+    var el = btn.closest('.text-block').querySelector('.text-content');
+    if (!el) { return; }
+    var nowClamped = el.classList.toggle('clamped');
+    btn.textContent = nowClamped ? 'Read more' : 'Show less';
+}
+</script>
+{% endif %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Categories — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>Categories</h1>
+        <a class="button-link secondary" href="/admin">Back</a>
+    </div>
+
+    <form method="post" action="/admin/categories/new" class="stacked-form">
+        {{ csrf_field(request) }}
+        <label>
+            New category
+            <input type="text" name="name" placeholder="e.g. Tools" required>
+        </label>
+        <button type="submit">Add category</button>
+    </form>
+
+    {% if categories|length == 0 %}
+        <p class="empty-state">No categories yet. Add your first one above.</p>
+    {% else %}
+    <table class="admin-table categories-table">
+        <thead>
+            <tr>
+                <th>Order</th>
+                <th>Name</th>
+                <th>Products</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td>
+                    <div class="row-actions">
+                        <form method="post" action="/admin/categories/{{ cat.id }}/move/up">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button" title="Move up">↑</button>
+                        </form>
+                        <form method="post" action="/admin/categories/{{ cat.id }}/move/down">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button" title="Move down">↓</button>
+                        </form>
+                    </div>
+                </td>
+                <td>{{ cat.name }}</td>
+                <td>{{ counts[cat.id] }}</td>
+                <td>
+                    <div class="row-actions">
+                        <a class="icon-button" href="/admin/categories/{{ cat.id }}/edit">Edit</a>
+                        <form method="post" action="/admin/categories/{{ cat.id }}/delete"
+                              onsubmit="return confirm('Delete &quot;{{ cat.name }}&quot;? Products in it will become uncategorized, not deleted.');">
+                            {{ csrf_field(request) }}
+                            <button type="submit" class="icon-button danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</main>
+{% endblock %}

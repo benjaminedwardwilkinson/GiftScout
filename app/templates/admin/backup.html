@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Backups — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>Backups</h1>
+        <a class="button-link secondary" href="/admin">Back</a>
+    </div>
+
+    <form method="post" action="/admin/backup/save" class="stacked-form">
+        {{ csrf_field(request) }}
+        <label>
+            Destination
+            <input type="text" name="destination" value="{{ destination }}"
+                   placeholder="user@nas.local:/backups/dadgiftscout or /mnt/usb-backup">
+        </label>
+        <p class="field-hint">
+            Anything rsync understands: a local/mounted path, or <code>user@host:/path</code>
+            for a remote server over SSH.
+            {% if ssh_key_present %}
+            An SSH key is mounted and will be used automatically for remote destinations.
+            {% else %}
+            No SSH key is currently mounted — remote (SSH) destinations won't be able to
+            authenticate yet. Mount a private key into the container at
+            <code>/secrets/backup_key</code> (read-only) to enable those; see the README.
+            A local/mounted path destination works right now without any key.
+            {% endif %}
+        </p>
+        <label>
+            Run automatically
+            <select name="frequency">
+                <option value="off" {% if frequency == 'off' %}selected{% endif %}>Off — manual only</option>
+                <option value="daily" {% if frequency == 'daily' %}selected{% endif %}>Daily</option>
+                <option value="weekly" {% if frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+            </select>
+        </label>
+        <button type="submit">Save settings</button>
+    </form>
+
+    <form method="post" action="/admin/backup/run" class="stacked-form">
+        {{ csrf_field(request) }}
+        <button type="submit">Run backup now</button>
+    </form>
+
+    <section class="backup-status">
+        <h2 class="section-label">Last backup</h2>
+        {% if last_run_at %}
+        <p>
+            {{ last_run_at }} —
+            <span class="status-badge {{ 'active' if last_status == 'success' else 'archived' }}">{{ last_status }}</span>
+        </p>
+        {% if last_output %}
+        <pre class="backup-log">{{ last_output }}</pre>
+        {% endif %}
+        {% else %}
+        <p class="empty-state">No backup has run yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="backup-status">
+        <h2 class="section-label">Restore</h2>
+        <p class="field-hint">Pull a backup back down and replace what's on this site with it. Your current database is saved first, but this is a significant action — <a href="/admin/backup/restore">read the details before doing it</a>.</p>
+        {% if restore_last_run_at %}
+        <p>
+            {{ restore_last_run_at }} —
+            <span class="status-badge {{ 'active' if restore_last_status == 'success' else 'archived' }}">{{ restore_last_status }}</span>
+        </p>
+        {% if restore_last_output %}
+        <pre class="backup-log">{{ restore_last_output }}</pre>
+        {% endif %}
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Edit Category — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>Edit Category</h1>
+        <a class="button-link secondary" href="/admin/categories">Back</a>
+    </div>
+    <form method="post" action="/admin/categories/{{ category.id }}/edit" class="stacked-form">
+        {{ csrf_field(request) }}
+        <label>
+            Name
+            <input type="text" name="name" required value="{{ category.name }}">
+        </label>
+        <label>
+            Slug
+            <input type="text" name="slug" value="{{ category.slug }}">
+        </label>
+        <p class="field-hint">
+            Public URL: /category/{{ category.slug }} — changing the slug will break any link to this
+            category that's already been shared.
+        </p>
+        <button type="submit">Save changes</button>
+    </form>
+</main>
+{% endblock %}

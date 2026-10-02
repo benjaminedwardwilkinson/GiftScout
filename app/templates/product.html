@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — {{ site_name }}{% endblock %}
+{% block og_title %}{{ product.name }} — {{ site_name }}{% endblock %}
+{% block twitter_title %}{{ product.name }} — {{ site_name }}{% endblock %}
+{% block body %}
+<header class="site-header">
+    <div class="wrap">
+        <h1><a href="/" class="site-header-home-link">{{ site_name }}</a></h1>
+        <p class="tagline">{{ site_tagline }}</p>
+    </div>
+</header>
+
+<main class="wrap">
+    <p class="breadcrumb">
+        <a href="/">Home</a>
+        {% if product.category_name %} / <a href="/category/{{ product.category_slug }}">{{ product.category_name }}</a>{% endif %}
+        / {{ product.name }}
+    </p>
+
+    <article class="product-detail">
+        <div class="product-gallery" data-product-gallery="{{ product.id }}">
+            {% if images|length > 0 %}
+            <img class="gallery-main" src="{{ images[0].image_path }}" alt="{{ product.name }}">
+            {% if images|length > 1 %}
+            <div class="gallery-thumbs">
+                {% for img in images %}
+                <button type="button"
+                        class="gallery-thumb {% if loop.first %}active{% endif %}"
+                        aria-label="Show photo {{ loop.index }} of {{ product.name }}"
+                        onclick="gsSwapImage('{{ img.image_path }}', this)">
+                    <img src="{{ img.image_path }}" alt="{{ product.name }} — photo {{ loop.index }}">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="gallery-main product-image-placeholder"></div>
+            {% endif %}
+        </div>
+
+        <div class="product-detail-body">
+            {% if product.category_name %}
+            <a class="product-category" href="/category/{{ product.category_slug }}">{{ product.category_name }}</a>
+            {% endif %}
+            <h2 class="product-detail-name">{{ product.name }}</h2>
+            {% if product.price %}
+            <p class="product-price">{{ product.price }}</p>
+            {% endif %}
+            {% if product.why_recommend %}
+            <p class="product-why">{{ product.why_recommend }}</p>
+            {% endif %}
+            {% if product.description %}
+            <p class="product-description">{{ product.description }}</p>
+            {% endif %}
+            <a class="buy-button" href="/go/{{ product.id }}" target="_blank" rel="noopener sponsored nofollow">
+                Check it out
+            </a>
+        </div>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <div class="wrap">
+        <p>{{ site_name }} may earn a commission from links on this page.</p>
+    </div>
+</footer>
+
+<script>
+function gsSwapImage(src, btn) {
+    var gallery = btn.closest('[data-product-gallery]');
+    var main = gallery.querySelector('.gallery-main');
+    if (main) { main.src = src; }
+    gallery.querySelectorAll('.gallery-thumb').forEach(function (t) {
+        t.classList.remove('active');
+    });
+    btn.classList.add('active');
+}
+</script>
+{% endblock %}

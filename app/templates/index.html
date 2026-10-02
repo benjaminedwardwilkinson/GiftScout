@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ site_name }} — {{ site_tagline }}{% endblock %}
+{% block og_title %}{{ site_name }} — {{ site_tagline }}{% endblock %}
+{% block twitter_title %}{{ site_name }} — {{ site_tagline }}{% endblock %}
+{% block body %}
+<header class="site-header">
+    <div class="wrap">
+        <h1>{{ site_name }}</h1>
+        <p class="tagline">{{ site_tagline }}</p>
+        {% include "partials/category_nav.html" %}
+    </div>
+</header>
+
+<main class="wrap">
+    {% set empty_message = "No recommendations yet. Check back soon." %}
+    {% include "partials/product_grid.html" %}
+</main>
+
+<footer class="site-footer">
+    <div class="wrap">
+        <p>{{ site_name }} may earn a commission from links on this page.</p>
+    </div>
+</footer>
+{% endblock %}

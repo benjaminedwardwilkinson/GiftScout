@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Account Settings — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="wrap narrow">
+    <div class="admin-header">
+        <h1>Account Settings</h1>
+        <a class="button-link secondary" href="/admin">Back</a>
+    </div>
+
+    {% if saved %}
+    <p class="form-success">Saved.</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" action="/admin/settings" class="stacked-form">
+        {{ csrf_field(request) }}
+        <label>
+            Username
+            <input type="text" name="username" required value="{{ current_username }}">
+        </label>
+        <label>
+            Current password
+            <input type="password" name="current_password" required autocomplete="current-password">
+        </label>
+        <label>
+            New password
+            <input type="password" name="new_password" autocomplete="new-password" placeholder="Leave blank to keep your current password">
+        </label>
+        <label>
+            Confirm new password
+            <input type="password" name="confirm_password" autocomplete="new-password">
+        </label>
+        <button type="submit">Save changes</button>
+    </form>
+    <p class="field-hint">Changing your password here takes effect immediately and stays until you change it again — the ADMIN_PASSWORD environment variable only sets the very first password.</p>
+</main>
+{% endblock %}
